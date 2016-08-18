@@ -84,7 +84,8 @@ def get_status_count():
                    'WARNING': 0,
                    'CRITICAL': 0,
                    'UNREACHABLE': 0,
-                   'DOWN': 0}
+                   'DOWN': 0,
+                   'OK': 0}
     for server in get_enabled_servers():
         state_count['UNKNOWN'] += server.unknown
         state_count['WARNING'] += server.warning

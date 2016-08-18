@@ -41,7 +41,7 @@ from Nagstamon.Config import (BOOLPOOL,
 ###debug_queue = sys.modules['__main__'].debug_queue
 
 # states needed for gravity comparison for notification and Generic.py
-STATES = ['UP', 'UNKNOWN', 'WARNING', 'CRITICAL', 'UNREACHABLE', 'DOWN']
+STATES = ['UNKNOWN', 'WARNING', 'CRITICAL', 'UNREACHABLE', 'DOWN', 'UP']
 
 # sound at the moment is only available for these states
 STATES_SOUND = ['WARNING', 'CRITICAL', 'DOWN']

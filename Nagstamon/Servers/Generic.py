@@ -80,7 +80,7 @@ class GenericServer(object):
 
     # URLs for browser shortlinks/buttons on popup window
     BROWSER_URLS = {'monitor': '$MONITOR$', \
-                    'hosts': '$MONITOR-CGI$/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=12', \
+                    'hosts': '$MONITOR-CGI$/status.cgi?hostgroup=all&style=hostdetail&limit=0', \
                     'services': '$MONITOR-CGI$/status.cgi?host=all&servicestatustypes=253', \
                     'history': '$MONITOR-CGI$/history.cgi?host=all'}
 
@@ -113,7 +113,7 @@ class GenericServer(object):
         self.worst_status_diff = self.worst_status_current = 'UP'
         self.nagitems_filtered_list = list()
         self.nagitems_filtered = {'services': {'CRITICAL': [], 'WARNING': [], 'UNKNOWN': []},
-                                  'hosts': {'DOWN': [], 'UNREACHABLE': []}}
+                                  'hosts': {'UP': [], 'DOWN': [], 'UNREACHABLE': []}}
         # number of filtered items
         self.nagitems_filtered_count = 0
         self.down = 0
@@ -121,6 +121,8 @@ class GenericServer(object):
         self.unknown = 0
         self.critical = 0
         self.warning = 0
+        self.ok = 0
+        self.up = 0
         self.all_ok = True
         self.status = ''
         self.status_description = ''
@@ -184,8 +186,8 @@ class GenericServer(object):
         'soft': self.monitor_cgi_url + '/status.cgi?host=all&servicestatustypes=253&serviceprops=524288&limit=0'}
         # hosts (up or down or unreachable)
         self.cgiurl_hosts = {
-        'hard': self.monitor_cgi_url + '/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=12&hostprops=262144&limit=0', \
-        'soft': self.monitor_cgi_url + '/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=12&hostprops=524288&limit=0'}
+        'hard': self.monitor_cgi_url + '/status.cgi?hostgroup=all&style=hostdetail&limit=0', \
+        'soft': self.monitor_cgi_url + '/status.cgi?hostgroup=all&style=hostdetail&limit=0'}
 
 
     def init_HTTP(self):
@@ -868,7 +870,7 @@ class GenericServer(object):
 
         # this part has been before in GUI.RefreshDisplay() - wrong place, here it needs to be reset
         self.nagitems_filtered = {'services': {'CRITICAL': [], 'WARNING': [], 'UNKNOWN': []},
-                                  'hosts': {'DOWN': [], 'UNREACHABLE': []}}
+                                  'hosts': {'UP': [], 'DOWN': [], 'UNREACHABLE': []}}
 
         # initialize counts for various service/hosts states
         # count them with every miserable host/service respective to their meaning
@@ -877,10 +879,11 @@ class GenericServer(object):
         self.unknown = 0
         self.critical = 0
         self.warning = 0
+        self.up = 0
 
         for host in self.new_hosts.values():
             # Don't enter the loop if we don't have a problem. Jump down to your problem services
-            if not host.status == 'UP':
+            if not host.status == 'disableUP':
                 # add hostname for sorting
                 host.host = host.name
                 # Some generic filters
@@ -935,6 +938,18 @@ class GenericServer(object):
                         host.visible = False
 
                 # Finegrain for the specific state
+                if host.status == 'UP':
+                    if conf.filter_all_down_hosts == True:
+                        if conf.debug_mode:
+                            self.Debug(server=self.get_name(), debug='Filter: DOWN ' + str(host.name))
+                        host.visible = False
+                    if self.up >= 200:
+                        host.visible = False
+
+                    if host.visible:
+                        self.nagitems_filtered['hosts']['UP'].append(host)
+                        self.up += 1
+
                 if host.status == 'DOWN':
                     if conf.filter_all_down_hosts == True:
                         if conf.debug_mode:

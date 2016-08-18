@@ -158,6 +158,8 @@ class Config(object):
         self.re_status_information_reverse = False
         self.color_ok_text = self.default_color_ok_text = '#FFFFFF'
         self.color_ok_background = self.default_color_ok_background = '#006400'
+        self.color_up_text = self.default_color_up_text = '#FFFFFF'
+        self.color_up_background = self.default_color_up_background = '#006400'
         self.color_warning_text = self.default_color_warning_text = "#000000"
         self.color_warning_background = self.default_color_warning_background = '#FFFF00'
         self.color_critical_text = self.default_color_critical_text = '#FFFFFF'

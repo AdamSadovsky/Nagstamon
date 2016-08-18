@@ -99,10 +99,12 @@ COLORS = OrderedDict([('DOWN', 'color_down_'),
                       ('UNREACHABLE', 'color_unreachable_'),
                       ('CRITICAL', 'color_critical_'),
                       ('UNKNOWN', 'color_unknown_'),
-                      ('WARNING', 'color_warning_')])
+                      ('WARNING', 'color_warning_'),
+                      ('UP', 'color_up_')])
 
 # states to be used in statusbar if long version is used
-COLOR_STATE_NAMES = {'DOWN': {True: 'DOWN', False: ''},
+COLOR_STATE_NAMES = {'UP': {True: 'UP', False: ''},
+                     'DOWN': {True: 'DOWN', False: ''},
                      'UNREACHABLE': { True: 'UNREACHABLE', False: ''},
                      'CRITICAL': { True: 'CRITICAL', False: ''},
                      'UNKNOWN': { True: 'UNKNOWN', False: ''},
@@ -4741,6 +4743,8 @@ class Dialog_Settings(Dialog):
         """
         # color buttons
         for color in [x for x in conf.__dict__ if x.startswith('color_')]:
+            if color == "color_up_background": continue
+            if color == "color_up_text": continue
             self.ui.__dict__['input_button_%s' % (color)].setStyleSheet('''background-color: %s;
                                                                            border-width: 1px;
                                                                            border-color: black;
@@ -4821,6 +4825,8 @@ class Dialog_Settings(Dialog):
         """
         for state in COLORS:
             # get text color from button CSS
+
+            if state == "UP": continue
             text = self.ui.__dict__['input_button_color_{0}_text'\
                                     .format(state.lower())]\
                                     .styleSheet()\
@@ -6111,6 +6117,7 @@ def create_brushes():
         intensity = 115
 
     # every state has 2 labels in both alteration levels 0 and 1
+#    print(STATES)
     for state in STATES[1:]:
         for role in ('text', 'background'):
             QBRUSHES[0][COLORS[state] + role] = QColor(conf.__dict__[COLORS[state] + role])
